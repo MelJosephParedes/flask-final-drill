@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, render_template
 from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
@@ -53,10 +53,16 @@ def protected_route():
     except Exception as e:
         return jsonify({"msg": str(e)}), 401
 
-@app.route("/")
-def hello_world():
-    return "<h1>Hello, World!</h1>"
-
+@app.route("/", methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        search_item = request.form['search_item']
+        cur = mysql.connection.cursor()
+        query = " SELECT * FROM customers INNER JOIN address ON customers.customer_id = address.address_id WHERE customer_name LIKE %s"
+        data = ('%' + search_item + '%',)
+        results = data_execute(query, data=data)
+        return render_template('search_results.html', results=results, search_item=search_item)
+    return render_template('search.html')
 # READ
 @app.route("/api/data/customers", methods=["GET"])
 def get_customers():
