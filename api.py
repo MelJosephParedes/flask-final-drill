@@ -199,13 +199,15 @@ def delete_customer(id):
 
 @app.route("/api/data/format", methods=["GET"])
 def get_params():
-    output_format = request.args.get("format", 'json')
-    if output_format.lower() == 'xml':
-        return {'Content-Type': 'application/xml'}, 200
-    elif output_format.lower() == 'json':
-        return jsonify(), 200
-    else:
-        return jsonify({"Error": "Invalid format specified"}), 400
-
+    try: 
+        output_format = request.args.get("format", 'json')
+        if output_format.lower() == 'xml':
+            return {'Content-Type': 'application/xml'}, 200
+        elif output_format.lower() == 'json':
+            return jsonify(), 200
+        else:
+            return make_response(jsonify({"Error": "Invalid format specified"}), 400)
+    except Exception as e:
+        return make_response(jsonify({"Error": "Internal Server Error" }), 500)
 if __name__ == "__main__":
     app.run(debug=True)

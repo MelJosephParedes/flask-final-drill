@@ -41,6 +41,28 @@ class MyAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertIsInstance(data, list)
+    
+    def test_get_customer_by_id(self):
+        response = self.app.get('/api/data/customers/1')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsInstance(data, list)
 
+    def test_add_customer(self):
+        test_data = {
+            'customer_name': 'Test customer',
+            'date_became_customer': '2024-01-02',
+            'line_1': '321 zone 4',
+            'line_2': 'mountain view',
+            'line_3': 'sta.monica',
+            'city': 'PPC',
+            'county_province': 'palawan',
+            'zip_or_postcode': '5300',
+            'country': 'philippines'
+        }
+        response = self.app.post('/api/data/customers', json=test_data)
+        self.assertEqual(response.status_code, 201)
+        data = response.get_json()
+        self.assertIn('rows_affected', data)
 if __name__ == "__main__":
     unittest.main()
