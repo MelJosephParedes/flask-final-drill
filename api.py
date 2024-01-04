@@ -52,7 +52,6 @@ def protected_route():
         return jsonify(logged_in_as=current_user), 200
     except Exception as e:
         return jsonify({"msg": str(e)}), 401
-    
 
 @app.route("/")
 def hello_world():
@@ -72,89 +71,92 @@ def get_customers_by_id(id):
     return make_response(jsonify(data), 200)
 
 
-@app.route("/actors/<int:id>/movies", methods=["GET"])
-def get_movies_by_actor(id):
-    data = data_execute(
-        """
-        SELECT film.title, film.release_year 
-        FROM actor 
-        INNER JOIN film_actor
-        ON actor.actor_id = film_actor.actor_id 
-        INNER JOIN film
-        ON film_actor.film_id = film.film_id 
-        WHERE actor.actor_id = {}
-    """.format(
-            id
-        )
-    )
-    return make_response(
-        jsonify({"actor_id": id, "count": len(data), "movies": data}), 200
-    )
-
-
-@app.route("/actors", methods=["POST"])
-def add_actor():
+# Create
+@app.route("/api/data/customers", methods=["POST"])
+def add_customer():
     cur = mysql.connection.cursor()
     info = request.get_json()
-    first_name = info["first_name"]
-    last_name = info["last_name"]
+    customer_name = info["customer_name"]
+    date_became_customer = info["date_became_customer"]
+    line_1 = info["line_1"]
+    line_2 = info["line_2"]
+    line_3 = info["line_3"]
+    city = info["city"]
+    province = info["county_province"]
+    zip_postcode = info["zip_or_postcode"]
+    country = info["country"]
     cur.execute(
-        """ INSERT INTO actor (first_name, last_name) VALUE (%s, %s)""",
-        (first_name, last_name),
+        """ INSERT INTO customers (customer_name, date_became_customer) VALUE (%s, %s)""",
+        (customer_name, date_became_customer),
     )
+    cur.execute(
+        """ INSERT INTO address (line_1, line_2, line_3, city, county_province, zip_or_postcode, country) VALUE (%s, %s, %s, %s, %s, %s, %s)""",
+        (line_1, line_2, line_3, city, province, zip_postcode, country),
+    )
+    
     mysql.connection.commit()
     print("row(s) affected :{}".format(cur.rowcount))
     rows_affected = cur.rowcount
     cur.close()
     return make_response(
         jsonify(
-            {"message": "actor added successfully", "rows_affected": rows_affected}
+            {"message": "customer added successfully", "rows_affected": rows_affected}
         ),
         201,
     )
 
 
-@app.route("/actors/<int:id>", methods=["PUT"])
-def update_actor(id):
+@app.route("/api/data/customers/<int:id>", methods=["PUT"])
+def update_customer(id):
     cur = mysql.connection.cursor()
     info = request.get_json()
-    first_name = info["first_name"]
-    last_name = info["last_name"]
+    customer_name = info["customer_name"]
+    date_became_customer = info["date_became_customer"]
+    line_1 = info["line_1"]
+    line_2 = info["line_2"]
+    line_3 = info["line_3"]
+    city = info["city"]
+    province = info["county_province"]
+    zip_postcode = info["zip_or_postcode"]
+    country = info["country"]
     cur.execute(
-        """ UPDATE actor SET first_name = %s, last_name = %s WHERE actor_id = %s """,
-        (first_name, last_name, id),
+        """ UPDATE customers SET customer_name = %s, date_became_customer = %s WHERE customer_id = %s """,
+        (customer_name, date_became_customer, id),
+    )
+    cur.execute(
+        """ UPDATE address SET line_1 = %s, line_2 = %s, line_3 = %s, city = %s, county_province = %s, zip_or_postcode = %s, country = %s WHERE address_id = %s """,
+        (line_1, line_2, line_3, city, province, zip_postcode, country, id),
     )
     mysql.connection.commit()
     rows_affected = cur.rowcount
     cur.close()
     return make_response(
         jsonify(
-            {"message": "actor updated successfully", "rows_affected": rows_affected}
+            {"message": "customer updated successfully", "rows_affected": rows_affected}
         ),
         200,
     )
 
-
-@app.route("/actors/<int:id>", methods=["DELETE"])
-def delete_actor(id):
+@app.route("/api/data/customers/<int:id>", methods=["DELETE"])
+def delete_customer(id):
     cur = mysql.connection.cursor()
-    cur.execute(""" DELETE FROM actor where actor_id = %s """, (id,))
+    cur.execute(""" DELETE FROM customers where customer_id = %s """, (id,))
+    cur.execute(""" DELETE FROM address where address_id = %s """, (id,))
     mysql.connection.commit()
     rows_affected = cur.rowcount
     cur.close()
     return make_response(
         jsonify(
-            {"message": "actor deleted successfully", "rows_affected": rows_affected}
+            {"message": "customer deleted successfully", "rows_affected": rows_affected}
         ),
         200,
     )
 
-@app.route("/actors/format", methods=["GET"])
+@app.route("/api/data/format", methods=["GET"])
 def get_params():
     fmt = request.args.get('id')
     foo = request.args.get('aaaa')
     return make_response(jsonify({"format":fmt, "foo":foo}),200)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
