@@ -32,5 +32,15 @@ class MyAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('logged_in_as', data)
 
+    def test_protected_route_without_token(self):
+        response = self.app.get('/api/data/protected')
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_customer(self):
+        response = self.app.get('/api/data/customers')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsInstance(data, list)
+
 if __name__ == "__main__":
     unittest.main()
