@@ -202,7 +202,9 @@ def get_params():
     try: 
         output_format = request.args.get("format", 'json')
         if output_format.lower() == 'xml':
-            return {'Content-Type': 'application/xml'}, 200
+            # Sample xml data
+            xml_data = '<root><message>Hello, this is XML content!</message></root>'
+            return {'Content-Type': 'application/xml'}, 200, xml_data
         elif output_format.lower() == 'json':
             return jsonify(), 200
         else:

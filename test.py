@@ -64,5 +64,23 @@ class MyAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertIn('rows_affected', data)
+    
+    def test_get_params_json_format(self):
+        response = self.app.get('/api/data/format')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
+
+    def test_get_params_xml_format(self):
+        tester = app.test_client(self)
+        response = tester.get('/api/data/format?format=xml')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_get_params_invalid_format(self):
+        response = self.app.get('/api/data/format?format=invalid_format')
+        self.assertEqual(response.status_code, 400)
+        data =response.get_json()
+        self.assertIn('Error', data)
+        self.assertIn('Invalid format specified', data['Error'])
+
 if __name__ == "__main__":
     unittest.main()
