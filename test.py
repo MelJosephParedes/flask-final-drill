@@ -1,5 +1,6 @@
 import unittest
 import warnings
+from flask import Flask, jsonify
 from api import app
 
 
@@ -10,21 +11,26 @@ class MyAppTests(unittest.TestCase):
 
         warnings.simplefilter("ignore", category=DeprecationWarning)
 
-    def test_index_page(self):
-        response = self.app.get("/")
+    def tearDown(self):
+        pass
+    
+    def test_login_valid_credentials(self):
+        response = self.app.post('/api/auth', json={'username': 'user123', 'password': 'qwerty'})
+        data = response.get_json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode(), "<p>Hello, World!</p>")
+        self.assertIn('access_token', data)
 
-    def test_getactors(self):
-        response = self.app.get("/actors")
+    def test_login_invalid_credentials(self):
+        response = self.app.post('/api/auth', json={'username': 'user12345', 'password': 'qwerty123'})
+        data = response.get_json()
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('Error', data)
+    
+    def test_protected_route_with_token(self):
+        response = self.app.get('/api/data/protected', headers={'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNDM4Mzk4MSwianRpIjoiYWNiODI3ZTEtZTA3ZC00Y2Y2LTg4YjUtNWYwNmJlYzkwOGIzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InVzZXIxMjMiLCJuYmYiOjE3MDQzODM5ODEsImNzcmYiOiI5MGNkNjFjMS1jYzVlLTRmMzAtYjU4OC0wM2EzNzE0MjY1ZWQiLCJleHAiOjE3MDQzODQ4ODF9.uyiqnEJ_2mZhoZCmbubizTPuF5EgQTxUNuUIlJSihQc'})
+        data = response.get_json()
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("PENELOPE" in response.data.decode())
-
-    def test_getactors_by_id(self):
-        response = self.app.get("/actors/88")
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("PESCI" in response.data.decode())
-
+        self.assertIn('logged_in_as', data)
 
 if __name__ == "__main__":
     unittest.main()
