@@ -65,15 +65,69 @@ class MyAppTests(unittest.TestCase):
         data = response.get_json()
         self.assertIn('rows_affected', data)
     
+    def test_update_customer(self):
+        test_data = {
+            'customer_name': 'Test customer',
+            'date_became_customer': '2024-01-02',
+            'line_1': '221 zone 2',
+            'line_2': 'mountain view',
+            'line_3': 'sta.monica',
+            'city': 'PPC',
+            'county_province': 'palawan',
+            'zip_or_postcode': '5300',
+            'country': 'philippines'
+        }
+
+        response = self.app.put('/api/data/customers/1', json=test_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIn('rows_affected', data)
+
+    def _test_update_nonexistent_customer(self):
+        test_data = {
+            'customer_name': 'Test customer',
+            'date_became_customer': '2024-01-02',
+            'line_1': '221 zone 2',
+            'line_2': 'mountain view',
+            'line_3': 'sta.monica',
+            'city': 'PPC',
+            'county_province': 'palawan',
+            'zip_or_postcode': '5300',
+            'country': 'philippines'
+        }
+
+        response = self.app.put('/api/data/customers/500', json=test_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data.get('rows_affected', 0), 0)
+
+    def test_delete_customer(self):
+        response = self.app.delete('/api/data/customers/2')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsNone(data, "Response data should be None")
+
+    def test_delete_nonexistent_customer(self):
+        response = self.app.delete('/api/data/customers/500')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsNotNone(data, "Response data should be None for nonexistent customer")
+        self.assertEqual(data.get('message'), 'customer not found')
+        self.assertEqual(data.get('rows_affected'), 0)
+    
     def test_get_params_json_format(self):
         response = self.app.get('/api/data/format')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
 
     def test_get_params_xml_format(self):
-        tester = app.test_client(self)
-        response = tester.get('/api/data/format?format=xml')
-        self.assertEqual(response.status_code, 200)
+        response = self.app.get('/api/data/format?format=xml' ,headers={'Content-Type': 'application/xml'})
+        
+        self.assertEqual(response.headers['Content-Type'], 'application/xml')
+        response_data = response.data.decode('utf-8')
+        self.assertIsNotNone(response)
+        xml_data = '<root><message>Hello, this is XML content!</message></root>'
+        self.assertEqual(response_data.strip(), xml_data.strip())
     
     def test_get_params_invalid_format(self):
         response = self.app.get('/api/data/format?format=invalid_format')

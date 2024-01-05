@@ -153,6 +153,12 @@ def update_customer(id):
         province = info["county_province"]
         zip_postcode = info["zip_or_postcode"]
         country = info["country"]
+
+        if not validate_date(date_became_customer):
+            return make_response(
+                jsonify({"Error": "Invalid date format for date became customer. USE YYYY-MM-DD."}),
+                400,
+            )
         cur.execute(
             """ UPDATE customers SET customer_name = %s, date_became_customer = %s WHERE customer_id = %s """,
             (customer_name, date_became_customer, id),
@@ -186,6 +192,12 @@ def delete_customer(id):
         mysql.connection.commit()
         rows_affected = cur.rowcount
         cur.close()
+
+        if rows_affected == 0:
+            return make_response(
+                jsonify({"message": "customer not found", "rows_affected": 0}),
+            )
+        
         return make_response(
             jsonify(
                 {"message": "customer deleted successfully", "rows_affected": rows_affected}
@@ -204,7 +216,9 @@ def get_params():
         if output_format.lower() == 'xml':
             # Sample xml data
             xml_data = '<root><message>Hello, this is XML content!</message></root>'
-            return {'Content-Type': 'application/xml'}, 200, xml_data
+            response = make_response(xml_data, 200)
+            response.headers['Content-Type'] = 'application/xml'
+            return response
         elif output_format.lower() == 'json':
             return jsonify(), 200
         else:
