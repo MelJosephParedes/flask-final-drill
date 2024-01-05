@@ -74,15 +74,28 @@ def search():
 
 @app.route("/api/data/customers", methods=["GET"])
 def get_customers():
-    data = data_execute("""select * from customers """)
-    return make_response(jsonify(data), 200)
-
+    try:
+        data = data_execute("""select * from customers """)
+        return make_response(jsonify(data), 200)
+    except Exception as e:
+        return make_response(
+            jsonify(
+                {"Error": str(e)}),
+            500,
+        )
 
 @app.route("/api/data/customers/<int:id>", methods=["GET"])
 def get_customers_by_id(id):
-    data = data_execute("""SELECT * FROM customers INNER JOIN address ON customers.customer_id = address.address_id 
-                      WHERE customers.customer_id = {}""".format(id))
-    return make_response(jsonify(data), 200)
+    try:
+        data = data_execute("""SELECT * FROM customers INNER JOIN address ON customers.customer_id = address.address_id 
+                        WHERE customers.customer_id = {}""".format(id))
+        return make_response(jsonify(data), 200)
+    except Exception as e:
+        return make_response(
+            jsonify(
+                {"Error": str(e)}),
+            500,
+        )
 
 def validate_date(date_str):
     try:
