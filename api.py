@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config["MYSQL_HOST"] = "localhost"
 app.config["MYSQL_USER"] = "root"
 app.config["MYSQL_PASSWORD"] = "lonelyheart05"

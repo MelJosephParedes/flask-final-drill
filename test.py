@@ -1,6 +1,5 @@
 import unittest
 import warnings
-from flask import Flask, jsonify
 from api import app
 
 

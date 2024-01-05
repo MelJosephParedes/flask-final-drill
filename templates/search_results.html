@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
     <title>Search Results</title>
 </head>
 <body>
     <h1>Search Results for "{{ search_item }}"</h1>
-    <ul>
-        {% for result in results %}
-            <li>{{ result }}</li>
-        {% endfor %}
-    </ul>
+    {% if results %}
+        <pre> {{ results | tojson(indent=2) }}</pre>
+    {% else %}
+        <p>No Results Found</p>
+    {% endif %}
 </body>
 </html>
