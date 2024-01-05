@@ -1,6 +1,4 @@
-## Hello, this project is using Flask framework building for REST API CRUD.
-
-## The project is composed of API for Create, Read, Update and Delete, test for test case and templates for the search functionality
+## Hello, this project is using Flask framework building for REST API CRUD. The project is composed of API for Create, Read, Update and Delete, test for test cases and templates for the search functionality
 
 ## Installation Instructions:
     - Clone the project to your computer
@@ -53,7 +51,7 @@ request to '/api/auth'
         "Error": "Internal Server Error"
     }
 
-# You can do it with the other endpoints just like the example that I mentioned.
+You can do it with the other endpoints just like the example that I mentioned.
 
 
 
